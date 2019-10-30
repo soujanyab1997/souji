@@ -1,0 +1,1140 @@
+understanding JPA
+CRUD operations
+Mapping simple entitites
+Querying entities
+andavanced features i.e. entity life cycle, callback, listeners
+put all pieces together
+
+=> Introduction
+	-> introduction
+	-> understanding jpa
+	-> managing elementary entities with jpa
+	-> querying entities
+	-> relationships and inheritance
+	-> entity life cycle, callbacks and listeners
+	-> JPA within java EE 7
+
+=> Prerequisites
+	-> Java
+	
+=> Usage of JPA
+	-> store, retrieve data in any rdbms
+
+=> what is persistence
+=> how do we usually persist data
+=> what's wrong with the way we do?
+=> how can jpa help?
+
+=> what is persistence
+	-> apps are made up of business logic, interaction with other systems, ui and data
+
+	-> most of the data that our app should manipulate have to be stored in db, retrieved, processed, transformed,and analyzed.
+
+	-> db acts as central point
+	-> manipulate data
+	-> relational database
+
+=> Manipulate persisted data without jpa
+----------------------------------------------
+	-> we deal with java objects, i.e. book
+	-> we store this book in a db 
+	-> retrieve books, filter, update, delete
+	-> we need a tool that maps java objects to a table	
+	-> it is called ORM tool
+	-> rely on external frameworks or use jdbc api
+
+	-> jdbc -> jdk 1.1 1997 
+	-> jdbc 4.1 - jdk 1.7
+	-> jdbc 4.3 - jdk 9
+	-> jdbc is robust, low level api, ends up with being quite verbose, it takes several lines of code just to bind an object to sql query 
+
+	public clss Book {
+		private long id;
+		rivate string title, desc, 
+		private float unitcost
+		private string isbn
+
+		//constructor, getter, setter
+	}
+
+	=> perform CRUD operations with JDBC
+
+	=> sql is not java,
+	=> java developers don't always know sql
+	=> they need to learn a new langualge, and work with low level api to convert rows and columns into objects
+	=> sql is not easy to refactor
+		-> if the db structure or the object changes
+		-> we need to manually update each sql statement
+	-> that's because the db structure is closely related to objects, there is no abstraction between both
+	-> this manual mapping makes the code really verbose
+	-> hard to read
+	-> hard to maintain
+
+==> manipulating persisted data with jpa
+--------------------------------------------------------------
+	-> standard
+	-> bridges the gaps between objects and rdbms
+	-> this object relational mapping is made through metadata, which brings high level of abstraction and doesn't tie our code  with the structure of database
+	-> removes boiler place code, by using a very simple api
+	-> Object Oriented query language
+	
+
+//add metadata.. to map these objects to database
+@Entity
+public class Book {
+
+	@Id
+	private int bookid;
+	....
+	....
+
+} 
+
+// main class
+-------------------------
+private static EntityManagerFactory emf = Persistence.createEntityManagerFactory('unitname');
+
+private static EntityManager em = emf.createEntityManager()
+
+
+	*==> connection to a db is made through an EntityManager
+	*==> no jdbc driver, url, user, pass
+	*==> the entire conf is made external in an xml	called 'persistence.xml'
+	*==> em.persist(new Book(...));
+	*==> em.find(Book.class, id);
+
+
+
+==> Advantages of jps
+	-> no manual mapping
+	-> no SQL Statemetns
+	-> interaction through EntityManager interface
+	-> Non intrusive and light weight
+	-> elegant api and powerful 
+
+==> RDBMS
+==> what is ORM tool
+==> What is JPA
+==> What it's Not
+==> JPA Mapping annotations
+==> API to CRUD and query objects
+	-> JAVA SE
+	-> JAVA EE
+
+*=> What is Database?
+---------------------------
+	-> organized collection of data
+	-> model our business requirements
+	-> process information
+	-> files
+	-> schema-less
+	-> relational databases
+
+=> Relational Databases
+------------------------------
+	-> collection of tables
+	-> rows, columns, Relationshiops, 
+	-> identify through primary keys
+	
+=> Object oriented Programming
+------------------------------------------
+	- objects
+	- classes
+	- inheritance
+	- reference to other classes
+	- abstract classes, interfaces, inheritance
+
+=> Object Relational Mapping
+--------------------------------
+	- bring relational databases and objects together
+	- objects have transient state
+	- relational databases store state
+	- mapping between objects and tables 
+	- JPA api helps in mapping objects and tables 
+=> JPA
+--------------------------------
+	=> JPA is an abstraction above jdbc that makes it possible to be independent of databases
+	=> it brings an easy mechanism to map objects to relational databases
+	=> it has an EntityManager api to perform db related operations such as CRUD
+	=> JPA also comes with jp query langauge to retrieve data with an object oriented query langauage
+	=> JPA also has a transaction mechanism and manages life cycle of our persistent objects
+
+=> WHAT JPA IS NOT??
+----------------------
+	-> cannot map objects ino non-structured databases
+	-> or any noSQL database
+	-> JPA Deals with objects so it's not  appropriate tool to map json/xml structures
+	-> jpql != sql
+
+=> History of JPA
+----------------------------
+	- ORM mapping solutionas have been around for a long time
+	- products like TopLink originally stated from SmallTalk
+	- 2002 : hibernate - first open source ORM tools
+	- successful but not standardized
+	- 2006 - JPA 1.0 (java EE 5)
+	- 2009 - JPA 2.0 (Java EE 6)
+	- 2013 - JPA 2.1 (Java EE 7)
+	- 2017 - JPA 2.2 (java EE 8)
+
+=> JPA
+-----------------------
+	- specification
+		- it went through the java community process to be standardized
+		- JSR 338 (JSR - java specification request)
+		- http://jcp.org/en/jsr/detail
+	
+=> JPA Implementations
+-------------------------------
+	-> JPA needs a runtime, which we call as a provider, which will implement which implements JSR 338 documentation
+	-> EclipseLink
+	-> Hiberbate
+	-> Open JPA
+
+=> jpa packages
+------------------------
+	-> javax.persistence			core api
+	-> javax.persistence.criteria		criteria api (used to write queries in object oriented way)
+	-> javax.persistence.metamodel		metamodel api (brings type safety to the object oriented queries)
+	-> javax.persistence.spi		SPI for java providers
+
+=> Where can we use JPA
+--------------------------
+
+
+
+
+=> JPA Entity
+--------------------
+	- when talking about mapping objects to a relational database, persisting objects or querying objects, the term "Entity" should be used rather than objects
+	- objects are just instances that leave in memory
+	- but Entities are objects that live shortly in memory and persistently in dbs
+	- they have an ability to be mapped to a database
+	- they can be concrete or abstract
+	- they support inheritance, relationships and so on
+	- entities also have persistence identity that uniquely identifies them in the database
+	- 
+
+	@Entity
+	@Table(name = "t_book)
+	public class Book{
+		@Id
+		@GeneratedValue(strategy = GenerationType.AUTO)
+		private long id;
+
+		@Column(name="book_title", nullable=false)
+		....
+		....
+	}
+
+	
+	- Once we have an Entity with right metadata, JPA offers the ability to query them and their relationships in a object oriented way 
+	- the "EntityManager" we can obtain from EntityManagerFactory
+		
+	static EntityManagerFactory emf = Persistence.createEntityManagerFactory("unitname");
+
+	static EntityManager em = emf.createEntityManager();
+
+	em.persist(new Book(...));
+
+	-> the role of EntityManager is to role entities
+	-> it has a set of API to allow simple CRUD operations
+	-> the EntityManager can also be used to query objects from database using JP query langugage (JPQL)
+
+=> Mapping Entities with JPA
+---------------------------------------------
+	- Managing entities 
+		- common operations you can do using the EntityManager API
+	- persistence unit	
+		- what it is and how it is related to EntityManager
+	- Mapping entities
+		- mapping metadata using annotations
+		- mapping metadata using xml
+	- unit test entities 
+
+=> Managing entities
+-----------------------------------------
+	- JPA has two sides, 1. the ability to map objects to relational database 2. query this mapped objects
+	- for this to work, several pieces and concepts have to be understood, the centralize serivice to manipulate instance of entity is the "EntityManager"
+	- it provides an API to create, find, remove and synchronize objects with the database
+	- in Java SE, we need a EntityManagerFactory to create it. 	
+	- in java EE, it can be injected
+
+	-> Persistence context : a set of managed entity instances is called a Persistence context
+
+	-> Persistence Unit : a named configuration of this set of entities
+	-> it is defined in the deployment descriptor called 'persistence.xml' 
+
+					Persistence
+					     |
+					     |
+					   creates
+					     |
+					     |
+   persistence.xml			EntityManagerFactory
+	|				     |
+    Persistence Unit			     |
+	|
+        |configured using		    creates
+	|				     |
+   PersistenceContext-------manages----------EntityManager	
+
+==>EntityManager (interaface)
+	- persist(entity:Object0
+	- find(entityClass:Class<T>, primaryKey: Object):<T>
+
+	=> this interface is responsible for creating, and removing persistence entity instances and finding entities by their primary keys 
+	=> it manages the state and lifecycle of entities, and use JPL queries to retrieve entities by following certains criterias. 
+
+
+	Application	----> EntityManager ----->DB
+				|
+				|	
+				Entity
+	
+
+	=> the application is responsible to obtain the instance of entityManager, which then interacts with entities. 
+
+	=> when an entitymanager obtains a reference to an entity, it is said to be managed.  
+	=> when an entity is managed, we can carry out persistence operations and the EntityManager will automatically synchronize the state of the entity with the database  
+
+
+=> Persistence Context
+-------------------------
+	-> set of managed entities
+
+	<persistence>
+
+
+	</persistence>
+
+
+	-> can have several persistence units
+	-> the persistence unit is named, to allow differentiation of one entityManagerFactory from another 
+
+	i.e. 
+	<persistence>
+		<persistence-unit name="myPu1">
+			<class>com.pluralsight.model.Book</class>
+			<class>com.pluralsight.model.CD</class>
+		</persistence-unit>
+	</persistence>	
+
+	-> the name "myPu1" lists a set of entities i.e. Book, CD, they are managed at a given time for given users transaction. 
+	-> this means that only onc entity instance, with the same persistence identity can exists in this persistent unit
+	-> the in memory state of the persistence entity will get synchronized with the database 
+	-> we can see the persistence context as a first level cache
+	-> the persistence unit is the bridge between the persistence context and the database, it defines various pieces of information the provider needs to know,  in order to manage persistence classes during exection and to physically connect to the databases using properties 
+
+	-> <properties>
+
+	   </properties>
+
+	-> these properties will tell the persistence context, which jdbc driver to use, where is the database is located and what the user, password is.
+
+		<property name="javax.persistence.jdbc.driver"
+			  value="oracle.driver.OracleDriver" />
+
+		<property name="javax.persistence.jdbc.url"
+			  value="jdbc:oracle:thin:@localhost:1521:xe" />
+
+
+		<property name="javax.persistence.jdbc.user"
+			  value="system" />
+
+
+		<property name="javax.persistence.jdbc.password"
+			  value="manager" />
+
+	-> standard properties
+	---------------------------------
+	<property name ="javax.persistence.database-product-name" value="Derby" />
+
+	<property name ="javax.persistence.schema-generation.database.action" value="drop-and-create" />
+	
+		-> this schema generation property instructs provider to drop and create the db schema
+
+	<property name ="javax.persistence.schema-generation.scripts.action" value="drop-and-create" />
+
+		-> this script action is for being able to generate the DDL scripts
+
+	-> but if these properties are set, we need to name the file that will contain all the create statements, and all the drop statements
+
+	<property name ="javax.persistence.schema-generation.scripts.create-target" value="create.ddl" />
+
+	<property name ="javax.persistence.schema-generation.scripts.dropt-target" value="drop.ddl" />
+
+
+
+==> CRUD operations on entity
+====================================
+
+	- the EntityManager performs these operations
+	- persist
+	- find
+	- remove
+	- update automatically happens when an entity is managed and one of its attribute value changes
+
+Transaction
+---------------------------
+	- data is crucial for business, and they must be accurate regardless of the opertion we perform
+	- a Transaction is used to ensure that the data kept in a consistent state.
+	- changes made to the database either success or fail automically
+	- a transction is an abstraction, to group together a series of operations
+	- once grouped, the set of operations is treated as a single unit and all the operations must succeed or none of them
+	- thats why persist, remove, update operations must be transactional
+		- find can be non-transactional
+	= we use 'EntityTransaction' api to start a transaction and commit it6
+
+==> Default Entity Mapping
+--------------------------------
+	- for a class to be an entity of JPA to use default mapping, the entity has to be annotated with 
+		@javax.persistence.Entity
+	- it allows the persistence provider to recognize it as a persistence class
+	- then, the @javax.persistence.Id defines the unique identifier
+
+	- must have no-arg constructor 
+	- can be concrete or abstract class
+	- enums or interfaces cannot be entities
+	- all attributes become persistent 
+
+
+	@Entity
+	public class Author {
+
+		@Id
+		private long id;
+		...
+		....
+	}
+
+	- unless, specified diffrently, the jpa provier should apply the default rules. 
+	- "configuration by exception", i.e. having to supply a configuration is the exception to the rule
+	- by default the entities are mapped to a relational table that has the same name
+	- attribute is mapped to column with same name
+	- jdbc rules apply for mapping java primitives to relational data types
+		string  = varchar(255)
+		long = bigint
+		boolean = smallint
+		...
+		enums = integer
+	
+==> Customizing Mapping with Metadata
+-----------------------------------------------
+	- jpa allows customized mapping from objects to table using annotations or xml descriptors
+		
+	- @Entity
+	  @Table(name = "T_AUTHOR" catalog = "CAT" schema= "ABC")
+
+
+	- when creating an entity the value of identifier can be generated manually by the application or automatically by the persistence provider
+		using the @GeneratedValue()
+
+	- @Id
+	  @GeneratedValue(strategy = "XXX")
+	
+	  strategy = 
+		1. GenerationType.SEQUENCE	
+			- use database sql sequence
+		2. GenerationType.IDENTITY
+			- use database identity column
+		3. Generationtype.TABLE
+			- instructs persistence provider to store the sequence name and its current value in a table increasing the value each time a new entity is persisted
+		4. GenerationType.AUTO
+			- the persistence provider does the generation of a key automatically
+			- it will pick appropriate strategy for a particular database
+			- AUTO is the default value and can be avoided
+
+		
+	- @Column(name="first_name",length=30,nullable=true)
+	- @Column(TemporalType.DATE)
+		  TemporalType.TIME
+		  TemporalType.TIMESTAMP
+
+	- @Transient
+	- @Enumerated(EnumType.ORDINAL) //DEFAULT
+			EnumType.STRING
+
+==> Mapping with XML
+-------------------------
+	- every single mapping annotation, has an xml equivalant
+	- xml overrides annotations
+	- if the database schema is differnet in dev/test/production
+	- 
+
+	<entity-mapping>
+		<entity class="com.xxx.Author">
+			<table name="T_Author" />
+			<attributes>
+				<basic name="title">
+					<column nullable="false" />
+				</basic>
+				<basic name="description">
+					<column length="300" nullable="false" />
+				</basic>
+				.....
+			</attributes>
+		</entity>
+	</entity-mapping>
+
+	persistence.xml
+	-------------------------
+	<persistence-unit>
+		<mapping-file>META-INF/author_mapping.xml</mapping-file>
+	</persistence-unit>
+
+	=> EntityManager, PersistenceContext, PersistentUnit
+	=> CRUD operations
+	=> Default Mapping
+	=> Annotation Metadata
+	=> XML metadata
+
+===> Relationships and Inheritance
+------------------------------------------
+	- Relationships
+	- Inheritance
+	- OOP
+	- RDBMS
+
+	=> Relationships
+	------------------------
+	- in OOP, we have associations between classes
+	- in OOP, these associations have a direction & cardinality
+	- unidirectional
+		CD ----> Musician
+
+	- bidirectional
+		CD <-----> Musician
+ 
+	- cardinality (how many entity exists)
+		CD ------> Musician (0-1, 1, 1*)
+
+	- cardinality in java
+		- an association that represents more than one object uses collections 
+		- i.e. Collection, Set, List, Map
+
+	- relationshiops in RDBMS
+		- collection of relations (table)
+		- tables
+		- primary key
+		- join column or join table 
+		- foreign key
+
+	- relationships in JPA
+		- map any relationship
+		- direction
+		- cardinality
+		- uses configuration by exception by default mapping
+		- annotations to customize the mapping
+			@OneToOne = join column
+			@ManyToOne - join column
+
+			@OneToMany = join table
+			@ManyToMany = join table
+
+
+
+	=> OneToOne unidirectional
+		- JPA will map this relationship by default 
+		- uses join column 
+		- it has by default, an eagar fetching policy
+
+			@OneToOne(fetch = FetchType.LAZY)
+
+		- but to map this relation using join table
+			@JoinTable
+		- can also change name of table
+			@JoinTable(name = "cd_musician",
+				   joinColumns=@JoinColumn(name = "cd_fk"),
+				   inverseJoinColumns=@Joincolumn(name = "musician_fk"))
+
+
+
+		@Entity
+		class CD {
+			
+			@OneToOne(fetch = FetchType.LAZY)
+			@JoinColumn(name = "musician_fk") OR @JoinTable
+			private Musician musician;
+	
+		}
+	
+		@Entity
+		class Musician {
+
+		}
+
+	=> OneToMany unidirectional
+
+		@Entity
+		class CD {
+			
+			@OneToMany
+			private Set<Musician> musicians  = new HashSet<>();
+		}
+
+		@Entity
+		class Musician {
+		}
+		
+	=> OneToMany bidirectional
+
+		@Entity
+		class CD {
+			
+			@OneToMany
+			private Set<Musician> musicians  = new HashSet<>();
+		}
+
+		@Entity
+		class Musician {
+
+			@ManyToOne
+			private CD cd;
+		}
+		
+	=> ManyToMany bidirectional
+
+		@Entity
+		class CD {
+			
+			@ManyToOne
+			private Set<Musician> musicians  = new HashSet<>();
+		}
+
+		@Entity
+		class Musician {
+
+			@ManyToOne
+			private CD cd;
+		}
+
+===> CRUD operations on Relationships
+--------------------------------------------
+	- now we have seen how mapping metadata can affect the mapping of a relationship
+	- until now we have seen tha, every EntityManager operation applies only to the entity supplied as an argument 
+		em.persist(cd)
+		em.remove(cd)
+		em.find(CD.class, id)
+
+	- but, when a CD contains a oneToMany relationship to musicians, by default these operations are not cascaded to the related entities.
+
+
+	*-> by default, operations are not cascaded
+
+	- something else that can affect the way we  load relationships we load from the database is the way we fetch them, either eagarly or lazily.
+	- CD ----> Musicians (1...*)
+
+
+		Set<Musician> m = new HashSet<>()
+		m.add(...)
+		m.add(...)
+
+		CD cd = new CD(...);
+		cd.setMusicians(m);
+		
+		em.persist(cd)
+		for(Musician mm : cd.getMusicians()){
+			em.persist(mm);
+		}
+
+	-> this is quite verbose, we would like to persist the root entity and cascade the persist event to the child entities. 
+	
+===> Cascade Events
+------------------------
+	-> we can customize the relationship mapping 
+	-> by default no persist event is cascaded
+	- but, by adding
+		@OneToMany(cascade = PERSIST)
+	
+	- the root entity, propagates the persist events on child
+	
+	- the cascade event can take an array of elements,
+		@OneToMany(cascade = {PERSIST, REMOVE, MERGE})
+
+	- and if you want to cascade all events 
+
+		@OneToMany(cascade = ALL)
+
+
+	*- by default events are not propagated
+	*- cascaded on all relationships
+		@OneToOne
+		@OneToMany
+		@ManyToOne
+		@ManyToMany
+
+	*- events that can be cascaded
+		- PERSIST
+		- REMOVE
+		- MERGE
+		- ALL
+
+===> Fetching Relationships
+---------------------------------
+	- there are two possible modes, 
+		1. Eagar(immediately)
+
+		E1 ---> E2 -----> E3 ------> E4	
+
+		-> if we load E1, by find() or query() all the dependent entities are loaded in memory
+		-> use for small amount of data
+
+		2. Lazy(deffered)
+	
+		E1 ---> E2 -----> E3 ------> E4	
+
+		-> when we load E1, nothing is loaded
+		-> we need to explicitely load E2, using get() method by telling the persistence provider to load the data from database
+		-> 
+
+==>Default Fetching
+--------------------------
+		@OneToOne		EAGER
+		@ManyToOne		EAGER
+		@OneToMany		LAZY
+		@ManyToMany		LAZY
+
+
+==> Inheritance
+----------------------------
+	- in rdbms, a table cannot inherit another table
+	- mapping inheritance, throws in several twists
+
+==> inheritance in JPA
+------------------------------
+	- jpa organizes a hierarchical object model into a flat relational structure
+	- because inheritance is an unknown concept in database, jpa has three differnet strategies we can choose from 
+	 
+		1. single-table-per-class
+		2. join-subclass
+		3. table-per-concrete-class
+	
+
+			Item
+			 |
+	---------------------------------
+	|			    	|
+	Book				CD
+
+
+==>single-table-per-class
+--------------------------------
+	- the default inheritance mapping strategy is the single table per class
+	- which maps all the entities in the hierarchy are mapped to a single table
+	- it is the sum of the attributes of the entire entity hierarchy, flattened down into a single table
+	- a discriminator column is used to explicitly type each row
+	- easiest to understand
+	- adding new entities to the hierarchy, or adding new columns to existing entities involves adding new columns to the table, migrating data and changing indexes
+	- this strategy also requires the columns of the child entity to be nullable		
+		- non null might cause difficulty in insertion
+
+==> join-subclass
+---------------------------------
+	- each entity in hierarchy is mapped to its own dedicated table.
+	- uses joins to reassemble entities
+
+==> table-per-concrete-class
+-------------------------------
+	- each entity is mapped to its own dedicated table like join-subclass
+	- the diff is that all attributes of root entity will also be mapped to columns on the child entity table
+	- so the attributes of item are also replicated in book and Cd
+	- in db point of view, this strategy de-normalizes the model and causes all root entity attributes to be redefined in the leaf entity
+	- no shared table, no shared column, and therefore no discriminator column
+
+
+	@Entity
+	@Inheritance(strategy=SINGLE_TABLE) OR @Inheritance(strategy=JOINED) OR @Inheritance(strategy=TABLE_PER_CLASS)
+	public class Item {
+
+	}
+
+
+	@Entity
+	public class Book extends Item{
+
+	}
+
+
+	@Entity
+	public class CD extends Item{
+
+	}
+
+	=> with SINGLE_TABLE or JOINED subclass strategy, when accessing the data, the persistent provider needs to know which row belongs to which entity	
+		- so it chooses a discriminator column to explicitely type each row, by default this column is called 'DTYPE' of type string and mapped to a VARCHAR column and contains the name of the Entity
+		- we can use 
+			@DiscriminatorColumn(name="DISC", discriminatorType=CHAR)
+			@DiscriminatorValue("I")
+
+===> Inheritance Hierarchy
+-----------------------------------
+
+	- Entities dont have to inherit entities
+	- entities can inherit from 
+		- transient classes / pojo classes
+		- abstract entities
+		- mapped superclasses
+
+	- @MappedSuperClass
+
+
+===> Querying Entities
+--------------------------
+	- JPA has two sides, 
+		1. ability to map objects to a relational database
+		2. ability to query these mapped objects
+
+	- in JPA, the centralize service to manipulate entities is the EntityManager
+	- it provides an API to create, find, remove and synchronize objects to the database
+	- but, it also allows execution of different sort of queries using JPQL
+
+	- JPQL = rich syntax, and can be used with...
+		- dyanamic or 
+		- named queries
+
+===> why do we need queries
+--------------------------------
+	- Getting data our the database is crucial
+	- seach
+	- sort
+	- aggregate
+	- analyze
+	- reporting
+	- business intelligence
+
+	- we use SQL for queries 
+
+		SELECT *
+		FROM ITEM
+		WHERE unit_cost > 100.00
+		ORDER BY title
+		
+
+		- JOIN
+		- GROUP BY
+
+===> JPQL
+----------------------
+	- Manipulate entities individually 
+	- CRUD operations
+	- finding by ID is limiting
+	- retrieve an entity by criteria
+
+	- inherent to relational database
+
+
+
+	- in sql the results are obtained in the form of rows and columns 
+	- jpql uses an Entity or Collection of Entities
+	- JPQL syntax is object oriented 
+	- database independent query language
+	- jpql translated into sql
+	- jdbc calls
+	- return entities 
+
+
+	SELECT *
+	FROM ITEM
+	WHERE unitcost>100
+	ORDER BY title
+
+	SELECT i
+	from Item i
+	where i.unitcost > 100
+	order by i.title
+
+
+	SELECT title AS Title, COUNT(*) AS Authors
+	FROM item
+		JOIN book_author
+		ON item.id = book_author.book_fk
+	GROUP BY item.title
+
+	
+	SELECT b.title, COUNT(a)
+	FROM Book b
+		LEFT JOIN b.authors a
+	GROUP BY b
+
+
+===> JPQL syntax
+----------------------------
+	
+	SELECT <selectclause>		//defines the format of query result
+	FROM <fromclause>		//defines the Entity from which the result will be obtained
+	[WHERE <whereclause>]
+	[ORDER BY <orderbyclause>]
+	[GROUP BY <groupbyclause>]
+	[HAVING <havingclause>]
+
+
+	<function> 	AVG, COUNT, MAX, MIN, SUM
+	<operators>	=, >, <, <=, =>, [NOT], [BETWEEN], IN, LIKE, IS, NULL, EMPTY, MEMBER OF
+	<num exp.>	ABS, SQRT, MOD, SIZE, INDEX, 
+	<string exp.>	CONCAT, SUBSTRING, TRIM, LOWER, UPPER, LENGTH, LOCATE
+	<date exp.	CURRENT_DATE, CURRENT_TIME, CURRENT_TIMESTAMP
+
+===> simplest JPQL query
+--------------------------------
+	SELECT b
+	FROM Book b
+	WHERE b.unitCost > 100
+
+		=> can return a list of entities
+		=> can return one or more attributes separated by a comma
+		=> aggregate functions 
+
+
+==> Query
+----------------------
+	- JPA 2.1 has 5 differnet types of queries that can be used, each with different purpose
+	- Dynamic query
+		- simplest form of the queury
+		- consist nothting more than a jpql statement dynamically specified at runtime
+	- named Query
+		- static and unchangable
+	-both can be implemented as a 'query' or a typedQuery api
+	-these are constructed by EntityManager
+
+		dynamicquery
+		createQuery(string)
+		createQuery(string, class) : TypedQuery
+		
+		namedquery:
+		createNamedQuery(string name) : Query
+		createNamedQuery(name, class) : TypedQuery
+
+	- the central point from choosing from dynamic or named query is the entitymanager interface
+		which has above methods
+
+	- createQuery() methods takes jpql statement as parameters
+	- Query interface
+		- getResultlist() : list
+		- getSingleResult() : object
+		- setMaxResults() : Query
+		- setFirstResult() : Query
+		- setParameter() : Query
+	
+
+
+	=> Dynamic Query
+	-------------------------
+		- defined on the fly as per the 
+		
+		Query query = em.createQuery("Select b from Book b WHERE b.unitcost > 29")
+		
+		Book book = (Book) query.getSingleResult();
+
+			-> may throw NonUniqueResultException if more than one results are found
+
+		List books  = query.getResultList()
+
+		TypedQuery<Book> query = em.createQuery("...");
+		List<Book> books  = query.getResultList();
+
+
+	=> queries frequently depend on parameters
+		-> positional binding
+		-> named parameters	
+
+	TypedQuery<Book> query = em.createQuery("Select b from Book b WHERE b.unitcost > 29")
+			
+
+	=> NamedQuery
+	-----------------
+		- static and unchangable
+	
+
+	@Entity
+	@NamedQuery(name="expensivebooks",
+		    query="select b from Book b
+			   where b.unitcost > 29")
+	public class Book{
+
+	}
+
+	em.createNamedQuery("expensivebooks")
+	Book b = (Book) query.getSingleResult()
+
+
+
+
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("puname");
+		EntityManager em = emf.createEntityManager();
+
+		em.persist();
+		em.find();
+		em.createQuery()
+		
+
+
+		EntityManager injection
+		-------------------------------
+
+		@PersistenceContext
+		EntityManager em;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+==> Entity Lifecycle / callbacks / Listeners
+-------------------------------------------------------
+	- lifecycle
+		- entities have life cycle, managed by entity manager
+		- we can apply callback annotations to perform some business logic, before or after 			the entity is persisted
+		- 
+	- entity listensers
+		- externalizing common behavior 
+
+	=> Entity Lifecycle
+	----------------------------
+		-> entities are pojos
+		-> created with new and garbadge collected 
+		- events occur depending on operations
+			- persisting
+			- updating
+			- removing
+			- loading
+		- depending on which life cycle stage we are, the entities are managed or detached
+
+			book b = new Book()	---> exist in memory / transient stage
+				|
+			em.persist(boook)	---> managed entity
+			em.find()
+				|
+			
+
+
+
+
+JPA 2.1 WITHIN JAVA ee 7
+-----------------------------------
+	- validation
+	- transaction
+	- injection
+	- persistence
+
+	- JSR 342
+	- contains 32 specification
+	- make them work together
+
+	- Java EE 7 is a managed environment 
+	- container
+		- manages providers
+	- 
+
+Integration with Java EE and and CDI
+------------------------------------------------
+	- Java EE container controls life-cycle
+	- it bootstraps the entitymanager
+	- provides access to EntityManager
+		- using JNDI lookup
+		- using injection with java EE @PersistenceContent annotation
+		- using CDI @Inject annotation
+	- invokes the EntityManager.close()
+	
+	- using the container services we can manage the lifecycle of entities 
+	
+	1. container injects the EntityManager using @PersistenceContext 
+
+		@PersistenceContext(unitName ="J1")
+		private EntityManager em;
+
+	2. using CDI
+
+		@Inject
+		private EntityManager em;
+
+	3. using JNDI lookup
+
+Integrate Transactional Components
+---------------------------------------
+	- 
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
